@@ -1,48 +1,50 @@
 package com.ecommerce.smallecommerce.controller;
 
 import com.ecommerce.smallecommerce.dto.ProductRequestDto;
-import com.ecommerce.smallecommerce.dto.ProductResponseDto;
-import com.ecommerce.smallecommerce.model.Product;
 import com.ecommerce.smallecommerce.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("api/product")
+@RequestMapping("/api")
 public class ProductController {
     private final ProductService productService;
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    @GetMapping("/get/all")
-    public List<ProductResponseDto> getProducts() {
-        return productService.getAllProducts();
+    @GetMapping("/products")
+    public ResponseEntity<?> getProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    @GetMapping("/get/{id}")
-    public ProductResponseDto getProduct(@PathVariable Long id) {
-        return productService.getProductById(id);
+    @GetMapping("/products/{id}")
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PostMapping("/create")
-    public ProductResponseDto createProduct(@RequestBody ProductRequestDto productRequest) {
-        Product product = productService.createProduct(productRequest);
-        return toDto(product);
+    @PostMapping("/products")
+    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductRequestDto productRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        return ResponseEntity.ok(productService.createProduct(productRequest));
     }
 
-    @PutMapping("/update/{id}") //TODO modify this function to allow update one thing
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.updateProduct(id, product);
+    @PutMapping("/products/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductRequestDto productRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+        return ResponseEntity.ok(productService.updateProduct(id, productRequest));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
-    private ProductResponseDto toDto(Product product) {
-        return new ProductResponseDto(product.getId(), product.getName(), product.getDescription(), product.getPrice());
-    }
 }

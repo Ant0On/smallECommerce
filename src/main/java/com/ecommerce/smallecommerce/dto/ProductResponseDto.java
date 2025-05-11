@@ -1,7 +1,5 @@
 package com.ecommerce.smallecommerce.dto;
 
-import com.ecommerce.smallecommerce.model.Product;
-
 public class ProductResponseDto {
     private Long id;
     private String name;

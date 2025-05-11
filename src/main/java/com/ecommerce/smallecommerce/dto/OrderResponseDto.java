@@ -1,8 +1,5 @@
 package com.ecommerce.smallecommerce.dto;
 
-import com.ecommerce.smallecommerce.model.Order;
-import com.ecommerce.smallecommerce.model.Product;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

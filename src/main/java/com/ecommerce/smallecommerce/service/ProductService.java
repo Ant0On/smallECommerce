@@ -22,22 +22,26 @@ public class ProductService {
     }
 
     public ProductResponseDto getProductById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow();
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Product not found for id " + id)
+        );
         return toDto(product);
     }
 
-    public Product createProduct(ProductRequestDto productRequest) {
-        Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice(), productRequest.getQuantity());
-        return productRepository.save(product);
+    public ProductResponseDto createProduct(ProductRequestDto productRequest) {
+        Product product = fromDto(productRequest);
+        return toDto(productRepository.save(product));
     }
 
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Product product = getProductById(id);
+    public ProductResponseDto updateProduct(Long id, ProductRequestDto updatedProduct) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Product not found for id " + id)
+        );
         product.setName(updatedProduct.getName());
         product.setDescription(updatedProduct.getDescription());
         product.setPrice(updatedProduct.getPrice());
         product.setQuantity(updatedProduct.getQuantity());
-        return productRepository.save(product);
+        return toDto(productRepository.save(product));
     }
 
     public void deleteProduct(Long id) {
@@ -46,5 +50,9 @@ public class ProductService {
 
     private ProductResponseDto toDto(Product product) {
         return new ProductResponseDto(product.getId(), product.getName(), product.getDescription(), product.getPrice());
+    }
+
+    private Product fromDto(ProductRequestDto dto) {
+        return new Product(dto.getName(), dto.getDescription(), dto.getPrice(), dto.getQuantity());
     }
 }
