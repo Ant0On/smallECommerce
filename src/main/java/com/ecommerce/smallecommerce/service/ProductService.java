@@ -2,6 +2,7 @@ package com.ecommerce.smallecommerce.service;
 
 import com.ecommerce.smallecommerce.dto.ProductRequestDto;
 import com.ecommerce.smallecommerce.dto.ProductResponseDto;
+import com.ecommerce.smallecommerce.exception.ProductNotFoundException;
 import com.ecommerce.smallecommerce.model.Product;
 import com.ecommerce.smallecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class ProductService {
 
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Product not found for id " + id)
+                () -> new ProductNotFoundException(id)
         );
         return toDto(product);
     }
@@ -35,7 +36,7 @@ public class ProductService {
 
     public ProductResponseDto updateProduct(Long id, ProductRequestDto updatedProduct) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Product not found for id " + id)
+                () -> new ProductNotFoundException(id)
         );
         product.setName(updatedProduct.getName());
         product.setDescription(updatedProduct.getDescription());
@@ -45,6 +46,9 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
         productRepository.deleteById(id);
     }
 
