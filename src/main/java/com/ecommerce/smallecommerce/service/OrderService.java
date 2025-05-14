@@ -3,6 +3,8 @@ package com.ecommerce.smallecommerce.service;
 import com.ecommerce.smallecommerce.dto.OrderRequestDto;
 import com.ecommerce.smallecommerce.dto.OrderResponseDto;
 import com.ecommerce.smallecommerce.dto.ProductResponseDto;
+import com.ecommerce.smallecommerce.exception.OrderNotFoundException;
+import com.ecommerce.smallecommerce.exception.ProductNotFoundException;
 import com.ecommerce.smallecommerce.model.Order;
 import com.ecommerce.smallecommerce.model.Product;
 import com.ecommerce.smallecommerce.repository.OrderRepository;
@@ -26,7 +28,7 @@ public class OrderService {
     public OrderResponseDto addOrder(OrderRequestDto orderRequest) {
         List<Product> products = orderRequest.getProductIds().stream()
                         .map(id -> productRepository.findById(id).orElseThrow(
-                                () -> new RuntimeException("product not find for id: " + id)
+                                () -> new ProductNotFoundException(id)
                         )).toList();
 
         Order order = new Order();
@@ -41,7 +43,7 @@ public class OrderService {
 
     public OrderResponseDto getOrderById(Long id) {
         return toDto(orderRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("order not find for id: " + id)
+                () -> new OrderNotFoundException(id)
         ));
     }
 
