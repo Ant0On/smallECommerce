@@ -4,6 +4,7 @@ import com.ecommerce.smallecommerce.dto.ProductRequestDto;
 import com.ecommerce.smallecommerce.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class ProductController {
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/products")
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductRequestDto productRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
